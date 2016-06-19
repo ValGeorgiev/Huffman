@@ -1,6 +1,10 @@
 package huffman;
 
 import java.util.PriorityQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.Scanner;
+
 
 public class Huffman {
     // input is an array of frequencies, indexed by character code
@@ -27,7 +31,7 @@ public class Huffman {
         return trees.poll();
     }
 
-    public static void printCodes(HuffmanTree tree, StringBuffer prefix) {
+    public static synchronized void printCodes(HuffmanTree tree, StringBuffer prefix) {
         assert tree != null;
         if (tree instanceof HuffmanLeaf) {
             HuffmanLeaf leaf = (HuffmanLeaf)tree;
@@ -51,20 +55,28 @@ public class Huffman {
     }
 
     public static void main(String[] args) {
-        String test = "ABRACADABRA";
+    	System.out.println("Enter how many threads you want to work for you: ");
+        
+    	String threads;
+      
+        Scanner scanIn = new Scanner(System.in);
+        threads = scanIn.nextLine();
 
-        // we will assume that all our characters will have
-        // code less than 256, for simplicity
-        int[] charFreqs = new int[256];
-        // read each character and record the frequencies
-        for (char c : test.toCharArray())
-            charFreqs[c]++;
+        scanIn.close();            
 
-        // build tree
-        HuffmanTree tree = buildTree(charFreqs);
-
-        // print out results
-        System.out.println("SYMBOL\tWEIGHT\tHUFFMAN CODE");
-        printCodes(tree, new StringBuffer());
+    	ExecutorService executor = Executors.newFixedThreadPool(5);
+       
+    	for (int i = 0; i < Integer.parseInt(threads); i++) {
+            Runnable worker = new WorkerThread("" + i);
+            executor.execute(worker);
+        }
+       
+    	executor.shutdown();
+        while (!executor.isTerminated()) {}
+        
+        System.out.println("Finished all threads");
+        
+       
+        
     }
 }
