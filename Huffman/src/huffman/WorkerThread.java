@@ -3,57 +3,52 @@ package huffman;
 public class WorkerThread implements Runnable {
  
     private String command;
+    private String text;
+    private int[] charFreqs;
+    private HuffmanTree tree;
 
-    public WorkerThread(String s){
+    public WorkerThread(String s, String text, int[] charFreqs, HuffmanTree tree){
         this.command = s;
+        this.text = text;
+        this.charFreqs = charFreqs;
+        this.tree = tree;
     }
 
     @Override
     public void run() {
-    	int[] charFreqs;
-    	String test;
-        System.out.println(Thread.currentThread().getName() + " Start. Command = " + command);
-		
-        synchronized (this) {
-            System.out.println("SYMBOL\tWEIGHT\tHUFFMAN CODE");
-            
-
-            // we will assume that all our characters will have
-            // code less than 256, for simplicity
-        	charFreqs = new int[256];
-    		test = "ABRACADABRA";
-    		
-        }
-         
-        // print out results
-        
-        charFreqs = processCommand(charFreqs, test);
        
-        
-        // build tree
-        HuffmanTree tree = Huffman.buildTree(charFreqs);
-        
-        // print out results
-        Huffman.printCodes(tree, new StringBuffer());
-        
-        System.out.println(Thread.currentThread().getName() + " End. ");
-
+    	System.out.println(Thread.currentThread().getName() + " Start. Command = " + command);
+                   
+        processCommand(charFreqs, text, tree);
+       
     }
 
-	private int[] processCommand(int[] charFreqs, String test) {
+	private void processCommand(int[] charFreqs, String text, HuffmanTree tree) {
 				
         try {
             
             // read each character and record the frequencies
-            for (char c : test.toCharArray())
-                charFreqs[c]++;
-            
+            for (char c : text.toCharArray()){
+            	synchronized (this){
+            		charFreqs[c]++;		
+            	}
+        	}                
            
         } catch (Exception e) {
             e.printStackTrace();            
         }
-    	return charFreqs;
+        
+        // build tree
+        tree = Huffman.buildTree(charFreqs);
+        
+        // print out results
+        Huffman.printCodes(tree, new StringBuffer()); 
+           
+        System.out.println(Thread.currentThread().getName() + " End. ");
+    	return;
 	}
+	
+	
 
     @Override
     public String toString(){

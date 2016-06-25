@@ -31,7 +31,7 @@ public class Huffman {
         return trees.poll();
     }
 
-    public static synchronized void printCodes(HuffmanTree tree, StringBuffer prefix) {
+    public static void printCodes(HuffmanTree tree, StringBuffer prefix) {
         assert tree != null;
         if (tree instanceof HuffmanLeaf) {
             HuffmanLeaf leaf = (HuffmanLeaf)tree;
@@ -53,30 +53,40 @@ public class Huffman {
             prefix.deleteCharAt(prefix.length()-1);
         }
     }
-
+    
+    
     public static void main(String[] args) {
+    	String text,
+    		threads;
+    	
+    	int[] charFreqs = new int[256];
+
+    	System.out.println("Enter some text: ");
+    	
+    	Scanner scanIn = new Scanner(System.in);
+    	text = scanIn.nextLine();
+
+        
     	System.out.println("Enter how many threads you want to work for you: ");
         
-    	String threads;
-      
-        Scanner scanIn = new Scanner(System.in);
         threads = scanIn.nextLine();
-
         scanIn.close();            
 
     	ExecutorService executor = Executors.newFixedThreadPool(5);
-       
+    	
+		HuffmanTree tree = Huffman.buildTree(charFreqs);
+		
+		
     	for (int i = 0; i < Integer.parseInt(threads); i++) {
-            Runnable worker = new WorkerThread("" + i);
+            Runnable worker = new WorkerThread("" + i, text, charFreqs, tree);
+        
             executor.execute(worker);
-        }
-       
+    	}
+   
+    	
     	executor.shutdown();
         while (!executor.isTerminated()) {}
         
-        System.out.println("Finished all threads");
-        
-       
-        
+        System.out.println("Finished all threads");   
     }
 }
