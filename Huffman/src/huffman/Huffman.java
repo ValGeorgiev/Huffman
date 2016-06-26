@@ -56,6 +56,7 @@ public class Huffman {
     
     
     public static void main(String[] args) {
+    	long startTime = System.currentTimeMillis();
     	String text,
     		threads;
     	
@@ -87,6 +88,11 @@ public class Huffman {
     	executor.shutdown();
         while (!executor.isTerminated()) {}
         
-        System.out.println("Finished all threads");   
+        System.out.println("Finished all threads");  
+        
+        long endTime   = System.currentTimeMillis();
+    	long totalTime = endTime - startTime;
+    	System.out.println(totalTime + " miliseconds");
+
     }
 }
