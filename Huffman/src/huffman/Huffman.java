@@ -78,7 +78,7 @@ public class Huffman {
 		
 		
     	for (int i = 0; i < Integer.parseInt(threads); i++) {
-            Runnable worker = new WorkerThread("" + i, text, charFreqs, tree);
+            Runnable worker = new WorkerThread("" + i, text, charFreqs, tree, Integer.parseInt(threads), i + 1);
         
             executor.execute(worker);
     	}

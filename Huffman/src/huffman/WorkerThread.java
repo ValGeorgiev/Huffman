@@ -6,12 +6,16 @@ public class WorkerThread implements Runnable {
     private String text;
     private int[] charFreqs;
     private HuffmanTree tree;
+    private Integer splitter;
+    private int whichThread;
 
-    public WorkerThread(String s, String text, int[] charFreqs, HuffmanTree tree){
+    public WorkerThread(String s, String text, int[] charFreqs, HuffmanTree tree, Integer splitter, int whichThread){
         this.command = s;
         this.text = text;
         this.charFreqs = charFreqs;
         this.tree = tree;
+        this.splitter = splitter;
+        this.whichThread = whichThread;
     }
 
     @Override
@@ -19,18 +23,27 @@ public class WorkerThread implements Runnable {
        
     	System.out.println(Thread.currentThread().getName() + " Start. Command = " + command);
                    
-        processCommand(charFreqs, text, tree);
+        processCommand(charFreqs, text, tree, splitter, whichThread);
        
     }
 
-	private void processCommand(int[] charFreqs, String text, HuffmanTree tree) {
-				
+	private void processCommand(int[] charFreqs, String text, HuffmanTree tree, Integer splitter, int whichThread) {
+		
+		int wordLen = text.length();
+		int limit = wordLen / splitter;
+		int upperBound = whichThread * limit;
+		int index;
+		
+		if(splitter.equals(whichThread)){
+			upperBound = wordLen;
+		}
+		
         try {
             
             // read each character and record the frequencies
-            for (char c : text.toCharArray()){
+            for (index = (whichThread - 1) * limit; index < upperBound; index++){
             	synchronized (this){
-            		charFreqs[c]++;		
+            		charFreqs[text.toCharArray()[index]]++;		
             	}
         	}                
            
