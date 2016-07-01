@@ -78,7 +78,7 @@ public class Huffman {
     	}
     }
     
-    public static void executor(String text, String threads){
+    public static void execute(String text, String threads, boolean flagQuiet){
 
     	int[] charFreqs = new int[256];
     	
@@ -88,7 +88,7 @@ public class Huffman {
 		
 		
     	for (int i = 0; i < Integer.parseInt(threads); i++) {
-            Runnable worker = new WorkerThread("" + i, text, charFreqs, tree, Integer.parseInt(threads), i + 1);
+            Runnable worker = new WorkerThread("" + i, text, charFreqs, tree, Integer.parseInt(threads), i + 1, flagQuiet);
         
             executor.execute(worker);
     	}
@@ -104,6 +104,7 @@ public class Huffman {
     	String text = null,
     		threads = null,
     		filename = null;
+    	boolean flagQuiet = false;
     	//boolean assignedText = false,
     	//        assignedThreads = false;
     	
@@ -122,6 +123,9 @@ public class Huffman {
     				threads = args[ind + 1];
     				//assignedThreads = !assignedThreads;
     			}
+    			if(args[ind].contentEquals("-q") || args[ind].contentEquals("-quiet")){
+    				flagQuiet = true;
+    			}
     		}
     	}
 
@@ -139,13 +143,13 @@ public class Huffman {
         }
         scanIn.close();
 	        
-        executor(text, threads);
+        execute(text, threads, flagQuiet);
         
         System.out.println("Finished all threads");  
         
         long endTime   = System.currentTimeMillis();
     	long totalTime = endTime - startTime;
-    	System.out.println(totalTime + " miliseconds");
+    	System.out.println("Total time for tree building: " + totalTime + " miliseconds");
 
     }
 }
