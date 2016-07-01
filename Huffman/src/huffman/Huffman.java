@@ -4,6 +4,9 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 
 public class Huffman {
@@ -54,25 +57,31 @@ public class Huffman {
         }
     }
     
+    public static String reader(String filename) throws IOException{
+    	BufferedReader br = null;
+    	StringBuilder sb = new StringBuilder();
+    	
+    	try{
+    		String currentLine;
+    		br = new BufferedReader(new FileReader(filename));
+    		
+    		while((currentLine = br.readLine()) != null){
+    			sb.append(currentLine);
+    			sb.append("\n");
+    		}
+    		return sb.toString();
+    	}
+    	finally{
+    		if(br != null){
+    			br.close();
+    		}
+    	}
+    }
     
-    public static void main(String[] args) {
-    	long startTime = System.currentTimeMillis();
-    	String text,
-    		threads;
-    	
+    public static void executor(String text, String threads){
+
     	int[] charFreqs = new int[256];
-
-    	System.out.println("Enter some text: ");
     	
-    	Scanner scanIn = new Scanner(System.in);
-    	text = scanIn.nextLine();
-
-        
-    	System.out.println("Enter how many threads you want to work for you: ");
-        
-        threads = scanIn.nextLine();
-        scanIn.close();            
-
     	ExecutorService executor = Executors.newFixedThreadPool(5);
     	
 		HuffmanTree tree = Huffman.buildTree(charFreqs);
@@ -87,6 +96,50 @@ public class Huffman {
     	
     	executor.shutdown();
         while (!executor.isTerminated()) {}
+    }
+    
+    
+    public static void main(String[] args){
+    	long startTime = System.currentTimeMillis();
+    	String text = null,
+    		threads = null,
+    		filename = null;
+    	//boolean assignedText = false,
+    	//        assignedThreads = false;
+    	
+    	if(args.length > 0){
+    		for(int ind = 0; ind < args.length; ind++){
+    			if(args[ind].contentEquals("-f")){
+    				filename = args[ind + 1];
+    				try{
+    					text = reader(filename);
+    					//assignedText = !assignedText;
+    				} catch (IOException ioe) {
+    					System.out.println("Problem reading from file: " + ioe.getMessage());
+    				}
+    			}
+    			if(args[ind].contentEquals("-t") || args[ind].contentEquals("-tasks")){
+    				threads = args[ind + 1];
+    				//assignedThreads = !assignedThreads;
+    			}
+    		}
+    	}
+
+    	Scanner scanIn = new Scanner(System.in);
+    	if(text == null){
+	    	System.out.println("Enter some text: ");
+	    	
+	    	text = scanIn.nextLine();
+    	}
+
+        if(threads == null){
+	    	System.out.println("Enter how many threads you want to work for you: ");
+	        
+	        threads = scanIn.nextLine();            
+        }
+        scanIn.close();
+	        
+        executor(text, threads);
         
         System.out.println("Finished all threads");  
         
